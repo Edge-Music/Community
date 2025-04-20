@@ -5,6 +5,7 @@ import { getQualityLevel, PreferencesCache, qualityLevels } from "../util/Prefer
 import { DialogAction, DialogHelper } from "@pura/harmony-dialog";
 import { ResponseCacheUtil } from "../util/ResponseCacheUtil";
 import { SongCacheManager } from "../util/SongCacheManager";
+import { ResourceManager } from "../util/ResourceManager";
 
 // 音乐播放设置组
 export const PlayerSetting = [
@@ -18,7 +19,7 @@ export const PlayerSetting = [
     getQualityLevel(PreferencesCache.playingLevel()).description, () => {
       DialogHelper.showSelectDialog({
         title: $r('app.string.setting_playing_level'),
-        confirm: '返回',
+        confirm: $r('app.string.back'),
         selectedIndex: qualityLevels.findIndex(bitrate => bitrate.bitrate === PreferencesCache.playingLevel()),
         radioContent: qualityLevels.map(level => level.description),
         onCheckedChanged: (index) => {
@@ -27,7 +28,7 @@ export const PlayerSetting = [
           PreferencesCache.playingLevel(bitrate);
           PlayerSetting[0].value = quality.description
           AppStorage.setOrCreate("PlayerSetting", PlayerSetting)
-          ToastUtil.showToast("音质已设置为：" + quality.description);
+          ToastUtil.showToast("音质已设置为：" + ResourceManager.getStringValueSync(quality.description as Resource));
         },
         onAction: () => {
         }
@@ -37,7 +38,7 @@ export const PlayerSetting = [
     getQualityLevel(PreferencesCache.downloadLevel()).description, () => {
       DialogHelper.showSelectDialog({
         title: $r('app.string.setting_download_level'),
-        confirm: '返回',
+        confirm: $r('app.string.back'),
         selectedIndex: qualityLevels.findIndex(bitrate => bitrate.bitrate === PreferencesCache.downloadLevel()),
         radioContent: qualityLevels.map(level => level.description),
         onCheckedChanged: (index) => {
@@ -46,7 +47,7 @@ export const PlayerSetting = [
           PreferencesCache.downloadLevel(bitrate);
           PlayerSetting[1].value = quality.description
           AppStorage.setOrCreate("PlayerSetting", PlayerSetting)
-          ToastUtil.showToast("音质已设置为：" + quality.description);
+          ToastUtil.showToast("音质已设置为：" + ResourceManager.getStringValueSync(quality.description as Resource));
         },
         onAction: () => {
         }
@@ -56,6 +57,7 @@ export const PlayerSetting = [
     $r('app.string.setting_playing_cache_desc'), PreferencesCache.playingCache().toString(), () => {
       DialogHelper.showTextInputDialog({
         title: $r('app.string.setting_playing_cache'),
+        buttons: [$r('app.string.cancel'), $r('app.string.confirm')],
         text: PlayerSetting[2].value?.toString(),
         inputType: InputType.Number,
         cancelButton: {
@@ -88,6 +90,7 @@ export const SoftwareSetting = [
     $r('app.string.setting_request_cache_expire_desc'), PreferencesCache.requestCacheExpire().toString(), () => {
       DialogHelper.showTextInputDialog({
         title: $r('app.string.setting_request_cache_expire'),
+        buttons: [$r('app.string.cancel'), $r('app.string.confirm')],
         text: SoftwareSetting[0].value?.toString(),
         inputType: InputType.Number,
         cancelButton: {
@@ -152,7 +155,7 @@ export const AboutSetting = [
         ToastUtil.showToast("跳转到浏览器失败！");
       });
   }),
-  new SettingItem("button", '个性化设置', undefined, undefined, () => {
+  new SettingItem("button", $r('app.string.custom_settings'), undefined, undefined, () => {
     AppStorage.setOrCreate("setting_page_sheet_content", "Personalized_settings")
     AppStorage.setOrCreate("setting_page_sheet_show", true)
   }),

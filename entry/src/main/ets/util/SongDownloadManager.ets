@@ -186,7 +186,7 @@ class SongDownloadManagerClass {
       const downloadSong = await SourceAdapter.getSongDetail(song, br)
       const url = downloadSong?.meta?.url || '';
       if (!url) {
-        ToastUtil.showShort("没有找到下载链接")
+        ToastUtil.showShort($r('app.string.no_download_link_found'))
         return false;
       }
 

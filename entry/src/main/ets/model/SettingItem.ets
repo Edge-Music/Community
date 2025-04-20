@@ -2,14 +2,14 @@ export class SettingItem {
   type: "toggle" | "text-switch" | "text-input" | "button";
   title: ResourceStr;
   subtitle?: ResourceStr;
-  value?: string | boolean;
+  value?: string | boolean | Resource;
   onClick?: () => void;
   onChange?: (value: boolean) => void;
 
   constructor(type: "toggle" | "text-switch" | "text-input" | "button",
     title: ResourceStr,
     subtitle?: ResourceStr,
-    value?: string | boolean,
+    value?: string | boolean | Resource,
     onClick?: () => void,
     onChange?: (value: boolean) => void) {
     this.type = type;

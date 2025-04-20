@@ -53,7 +53,8 @@ export struct Download {
             if (this.queue.size === 0) {
               ListItem() {
                 Column() {
-                  Text('暂无下载任务')
+                  Text($r('app.string.no_download_tasks'))
+                    .fontWeight(StyleConstants.FONT_WEIGHT_SEVEN)
                     .fontSize(16)
                     .fontColor($r('app.color.text_secondary'))
                 }
@@ -141,7 +142,7 @@ export struct Download {
       .width(StyleConstants.FULL_WIDTH)
       .height(StyleConstants.FULL_HEIGHT)
     }
-    .systemTransition(NavigationSystemTransitionType.SLIDE_RIGHT)
+    // .systemTransition(NavigationSystemTransitionType.SLIDE_RIGHT)
     .hideToolBar(true)
     .hideTitleBar(true)
     .backgroundColor($r('app.color.page_background'))

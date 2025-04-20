@@ -104,7 +104,7 @@ export struct PlaylistView {
     this.songDataSource.removeData(song);
 
     // 显示删除成功提示
-    ToastUtil.showShort('已从播放列表中删除');
+    ToastUtil.showShort($r('app.string.removed_from_the_playlist'));
   }
 
   // 滚动到当前播放的歌曲
@@ -160,7 +160,7 @@ export struct PlaylistView {
   @Builder
   EmptyState() {
     Column() {
-      Text('暂无歌曲')
+      Text($r('app.string.no_songs_available'))
         .fontWeight(StyleConstants.FONT_WEIGHT_SEVEN)
         .fontColor($r('app.color.text_hint'))
         .fontSize(16)

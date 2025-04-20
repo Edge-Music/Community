@@ -113,7 +113,7 @@ export struct TimerSelector {
           .fontWeight(FontWeight.Medium)
           .fontColor(minutes === this.selectedOption ? $r('app.color.dialog_background') : $r('app.color.text_primary'))
 
-        Text('分钟')
+        Text($r('app.string.minute'))
           .fontSize(12)
           .opacity(0.9)
           .margin({ left: 4 })
@@ -217,7 +217,7 @@ export struct TimerSelector {
       .transition({ type: TransitionType.All })
 
       // Section title for time options
-      Text('选择时间')
+      Text($r('app.string.select_time'))
         .fontSize(16)
         .fontWeight(FontWeight.Medium)
         .fontColor($r('app.color.text_primary'))
@@ -246,7 +246,7 @@ export struct TimerSelector {
       // Custom time button
       Button() {
         Row() {
-          Text('自定义时间')
+          Text($r('app.string.custom_time'))
             .fontColor($r('app.color.text_primary'))
             .fontSize(16)
             .fontWeight(FontWeight.Medium)
@@ -260,7 +260,7 @@ export struct TimerSelector {
       .borderRadius(26)
       .onClick(() => {
         DialogHelper.showTextInputDialog({
-          title: "设置定时关闭",
+          title: $r('app.string.set_scheduled_shutdown'),
           text: this.pauseAt > 0 ? Math.floor((this.pauseAt - Date.now()) / 60000).toString() : '',
           inputType: InputType.Number,
           cancelButton: {

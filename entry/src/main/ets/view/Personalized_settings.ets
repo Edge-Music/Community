@@ -1,5 +1,7 @@
 import { PreferencesCache } from "../util/PreferenceCache";
 import {HorizontalMode}from '../util/HorizontalCheck'
+import { ResourceManager } from "../util/ResourceManager";
+
 @Component
 //'0'关。'1'开。!!!!(开关颜色日后调)
 export struct Personalized_settings_Component {
@@ -48,7 +50,7 @@ export struct Personalized_settings{
   HorizontalMode_Ctrl(){
     Column(){
       Row(){
-        Text('受控制中心的旋转开关控制')
+        Text($r('app.string.system_rotary_switch'))
           .fontSize(16)
           .fontWeight(FontWeight.Medium)
           .fontColor($r('app.color.text_primary'))
@@ -84,11 +86,11 @@ export struct Personalized_settings{
       Column(){
         List({ space: 8, initialIndex: 0 }){
           ListItem(){this.HorizontalMode_Ctrl()}
-          ListItem(){ Personalized_settings_Component({text_name:'mini播放器置于最底部',setUserPreference_name:'miniplaying_bottom_judge'})}
-          ListItem(){ Personalized_settings_Component({text_name:'播放页滑动封面切换下一首/上一首',setUserPreference_name:'img_playing_ctrl'})}
+          ListItem(){ Personalized_settings_Component({text_name: ResourceManager.getStringValueSync($r('app.string.mini_music_control_bottom')), setUserPreference_name:'miniplaying_bottom_judge'})}
+          ListItem(){ Personalized_settings_Component({text_name: ResourceManager.getStringValueSync($r('app.string.swipe_cover_switch_songs')), setUserPreference_name:'img_playing_ctrl'})}
         }
       }.padding(16)
-    }.title('个性化设置').hideToolBar(true)
+    }.title($r('app.string.custom_settings')).hideToolBar(true)
 
   }
 }

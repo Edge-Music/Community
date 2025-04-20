@@ -1,15 +1,23 @@
 import { VibrationControl } from './DeviceController'
 
 const _promptString: string[] = ["", "释放→设置", "释放→搜索", "下拉→刷新", "释放→刷新", "释放→上一页"]
-const promptString: string[] = ["", "设置←释放", "搜索←释放", "刷新←下拉", "刷新←释放", "上一页←释放"]
+const __promptString: string[] = ["", "设置←释放", "搜索←释放", "刷新←下拉", "刷新←释放", "上一页←释放"]
+const promptString: Resource[] = [
+  $r('app.string.blank'),
+  $r('app.string.release_settings'),
+  $r('app.string.release_search'),
+  $r('app.string.pull_refresh'),
+  $r('app.string.release_refresh'),
+  $r('app.string.release_back')
+]
 type SlideTypeByTagConfigMap = Record<string, TagConfig>
 
 class TagConfig {
   tag: string
   computeFunction: (offset: number) => number
-  getActionText: (index: number) => string
+  getActionText: (index: number) => Resource
 
-  constructor(tag: string, computeFunction: (offsetY: number) => number, getFunction: (index: number) => string) {
+  constructor(tag: string, computeFunction: (offsetY: number) => number, getFunction: (index: number) => Resource) {
     this.tag = tag
     this.computeFunction = computeFunction
     this.getActionText = getFunction
@@ -50,7 +58,7 @@ export class SlideDownControl {
    * @param index
    * @returns
    */
-  public static getIndexActionText(index: number): string {
+  public static getIndexActionText(index: number): Resource {
     switch (index) {
       case 0:
         VibrationControl.handlePresetVibration()
@@ -71,7 +79,7 @@ export class SlideDownControl {
    * @param index
    * @returns
    */
-  public static getLibraryActionText(index: number): string {
+  public static getLibraryActionText(index: number): Resource {
     switch (index) {
       case 0:
         VibrationControl.handlePresetVibration()
@@ -91,7 +99,7 @@ export class SlideDownControl {
    * @param index
    * @returns
    */
-  public static getReturnActionText(index: number): string {
+  public static getReturnActionText(index: number): Resource {
     switch (index) {
       case 0:
         VibrationControl.handlePresetVibration()

@@ -15,7 +15,10 @@ import { TimerSelector } from '../component/TimerSelector'
 import { isHorizontalMode } from '../util/HorizontalCheck'
 import { screen_on } from '../util/On_screen_control'
 import { SongDownloadManager } from '../util/SongDownloadManager'
-
+import { hilog } from '@kit.PerformanceAnalysisKit';
+import { resourceManager } from '@kit.LocalizationKit';
+import { http } from '@kit.NetworkKit';
+import ImageUtils from '../util/ImageUtils';
 @Builder
 export function PlayingBuilder() {
   Playing()
@@ -33,8 +36,9 @@ struct Playing {
   @State isFavorite: boolean = false
   @State playMode: number = PlaylistManager.getPlayMode()
   @State showPlaylist: boolean = false
-  @StorageLink("current_playing_song") song: Song | null = null
+  @Watch('onplaying_change')@StorageLink("current_playing_song") song: Song | null = null
   @State isWideScreen: boolean = false // 是否为宽屏
+  @State imageColorHex:string='1a2a3a'
   @State currentIndex: number = -1
   // 独立的按钮动画状态
   @State swipeOffset: number = 0; // 滑动偏移量
@@ -52,13 +56,14 @@ struct Playing {
   @State isBackButtonPressed: boolean = false
   @State Playing_Next: boolean = true
   @State Fold_judge: boolean = true
+  @State is_backblur: boolean = true
   private updateTimer: number = -1
   //TAB,swiper控制
   private controller: TabsController = new TabsController()
   private swiperController: SwiperController = new SwiperController()
   // 歌曲封面-歌词翻转
   @State flipCoverLyric: boolean = PreferencesCache.flipCoverLyric()
-
+  @State  Pura_X:string =  PreferencesCache.getUserPreference('is_Pura_X', '0')//pura_x尝试适配
   // 监听屏幕断点变化
   onBreakpointChange() {
     this.isWideScreen = this.currentBreakpoint !== BreakpointConstants.BREAKPOINT_SM;
@@ -66,13 +71,27 @@ struct Playing {
     console.info('Succeeded in obtaining fold status.judge: ' + this.Playing_Next);
   }
 
+  async onplaying_change(){
+    try {
+      const context = getContext(this);
+      let netFile = this.song?.album?.cover + "?param=64y64" ?? "";
+      let httpRequest = http.createHttp()
+      let data = await httpRequest.request(netFile);
+      const resourceMgr: resourceManager.ResourceManager = context.resourceManager;
+      let imageDealData = await ImageUtils.getImageDealDataByArr(data.result as ArrayBuffer);//imageDealData.imageColorHex.length
+      this.imageColorHex=imageDealData.imageColorHex
+    } catch (e) {
+      hilog.error(0x0000, 'TestTag', 'Failed error.code is %{public}d,error.message is %{public}s', e.code,
+        e.message);
+    }
+  }
   @State sheetType: "playlist" | "timer" = "playlist" // 用于控制底部弹出表单的类型，默认为播放列表
 
   @Builder
   PlayListBuilder() {
     Column() {
       // 播放列表内容
-      Text("播放列表")
+      Text($r('app.string.playing_list'))
         .fontSize(18)
         .fontWeight(StyleConstants.FONT_WEIGHT_SEVEN)
         .fontColor($r('app.color.text_title'))
@@ -90,7 +109,7 @@ struct Playing {
   @Builder
   Timer() {
     Column() {
-      Text("定时关闭")
+      Text($r('app.string.scheduled_shutdown'))
         .fontSize(18)
         .fontWeight(StyleConstants.FONT_WEIGHT_SEVEN)
         .fontColor($r('app.color.text_title'))
@@ -154,6 +173,20 @@ struct Playing {
                   offsetX: 0,
                   offsetY: 2
                 })
+                .onAppear(async ()=>{
+                  try {
+                    const context = getContext(this);
+                    const resourceMgr: resourceManager.ResourceManager = context.resourceManager;
+                    let netFile = this.song?.album?.cover + "?param=64y64" ?? "";
+                    let httpRequest = http.createHttp()
+                    let data = await httpRequest.request(netFile);
+                    let imageDealData = await ImageUtils.getImageDealDataByArr(data.result as ArrayBuffer);//imageDealData.imageColorHex.length
+                    this.imageColorHex=imageDealData.imageColorHex
+                  } catch (e) {
+                    hilog.error(0x0000, 'TestTag', 'Failed error.code is %{public}d,error.message is %{public}s', e.code,
+                      e.message);
+                  }
+                })
                 .borderRadius(this.img_playing_ctrl==='1'?0:24)
                 .gesture(
                   PanGesture({ direction: PanDirection.Horizontal })
@@ -211,7 +244,7 @@ struct Playing {
                   fill: false
                 })
               TextClock()
-                .fontColor("#23E421")
+                .fontColor(`#ff${this.imageColorHex}`)
                 .format('HH:mm')
                 .blendMode(BlendMode.PLUS, BlendApplyType.OFFSCREEN)
                 .margin(12)
@@ -235,9 +268,6 @@ struct Playing {
 
         Column() {
           LyricsView({
-            currentTimeMs: this.currentTime,
-            lyrics: this.song?.meta?.lyric?.normal,
-            translationLyrics: this.song?.meta?.lyric?.translation || this.song?.meta?.lyric?.transliteration,
             mode_judge: false
           }).width('100%').layoutWeight(1)
 
@@ -248,7 +278,7 @@ struct Playing {
             .textOverflow({ overflow: TextOverflow.Ellipsis })
             .fontColor('rgba(255, 255, 255, 0.6)')
             .height(24) // 固定高度确保布局稳定
-          Column(){this.PlayerControls()}.width('50%')
+          Column(){this.PlayerControls(this.Pura_X==='1'?false:true)}.width('50%')
           Column(){
             this.ProgressBar(true,4,false)
           }.width('65%')
@@ -256,8 +286,9 @@ struct Playing {
         }
         .padding(18)
         .width('65%')
-      }.alignItems(VerticalAlign.Center).justifyContent(FlexAlign.SpaceBetween).onAppear(()=>{        PreferencesCache.setUserPreference('Playing_HorizontalMode_index','0')
-        console.info("zhishi0")})
+      }.alignItems(VerticalAlign.Center).justifyContent(FlexAlign.SpaceBetween).onAppear(()=>{
+        PreferencesCache.setUserPreference('Playing_HorizontalMode_index','0')
+      })
       Row() {
         //封面图
         Column() {
@@ -275,6 +306,20 @@ struct Playing {
               width: { top:this.img_playing_ctrl==='1'? "10px":"0px", bottom: this.img_playing_ctrl==='1'? "10px":"0px", left: this.img_playing_ctrl==='1'? "10px":"0px", right: this.img_playing_ctrl==='1'? "10px":"0px" },
               repeat: RepeatMode.Stretch,
               fill: false
+            })
+            .onAppear(async ()=>{
+              try {
+                const context = getContext(this);
+                const resourceMgr: resourceManager.ResourceManager = context.resourceManager;
+                let netFile = this.song?.album?.cover + "?param=64y64" ?? "";
+                let httpRequest = http.createHttp()
+                let data = await httpRequest.request(netFile);
+                let imageDealData = await ImageUtils.getImageDealDataByArr(data.result as ArrayBuffer);//imageDealData.imageColorHex.length
+                this.imageColorHex=imageDealData.imageColorHex
+              } catch (e) {
+                hilog.error(0x0000, 'TestTag', 'Failed error.code is %{public}d,error.message is %{public}s', e.code,
+                  e.message);
+              }
             })
             .gesture(
               PanGesture({ direction: PanDirection.Horizontal })
@@ -349,9 +394,6 @@ struct Playing {
         .alignItems(HorizontalAlign.Center)
         Column() {
           LyricsView({
-            currentTimeMs: this.currentTime,
-            lyrics: this.song?.meta?.lyric?.normal,
-            translationLyrics: this.song?.meta?.lyric?.translation || this.song?.meta?.lyric?.transliteration,
             mode_judge: false
           }).width('100%').layoutWeight(1)
         }
@@ -359,18 +401,33 @@ struct Playing {
         .width('65%')
       }.alignItems(VerticalAlign.Top).justifyContent(FlexAlign.SpaceBetween)
     }.loop(false)
-    .onAppear(()=>{
+    .onAppear( ()=>{
       this.img_playing_ctrl=  PreferencesCache.getUserPreference('img_playing_ctrl','0')
+      this.is_backblur=false
+
+    })
+    .onDisAppear(()=>{
+      this.is_backblur=true
+    })
+    .linearGradient({
+      direction: GradientDirection.Bottom,
+      repeating: false,
+      colors: [[`#ff${this.imageColorHex}`, 0.0], [`#aa${this.imageColorHex}`, 0.3], [`#cc${this.imageColorHex}`, 0.5], [`#ff${this.imageColorHex}`, 1.0]]
+    })
+    .backgroundColor($r('sys.color.ohos_id_color_background'))
+    .animation({
+      duration: 300,
+      curve: Curve.Friction,
+      iterations: 1,
+      playMode: PlayMode.Normal
     })
     .effectMode(EdgeEffect.None)
     .curve(Curve.Smooth)
     .onChange((index:number)=>{
       if (index===1) {
         PreferencesCache.setUserPreference('Playing_HorizontalMode_index','1')
-        console.info("jizhishi_Swiperi_index1")
       }else {
         PreferencesCache.setUserPreference('Playing_HorizontalMode_index','0')
-        console.info("jizhishi_Swiperi_index0")
       }
     })
     .indicator(
@@ -382,6 +439,7 @@ struct Playing {
         .color(Color.Gray)
         .selectedColor(Color.White)
     )
+    .expandSafeArea()
     .onAppear(() => {
       if (PreferencesCache.getUserPreference('Playing_HorizontalMode_index')==='1') {
         this.swiperController.changeIndex(1)
@@ -494,7 +552,7 @@ struct Playing {
   }
 
   @Builder
-  BlurBackground() {
+  BlurBackground(judge:boolean = true) {
     Stack() {
       Image(cover(this.song?.album?.cover ?? "", 512))
         .width(StyleConstants.FULL_WIDTH)
@@ -513,8 +571,8 @@ struct Playing {
         })
         .expandSafeArea()
     }
-    .width(StyleConstants.FULL_WIDTH)
-    .height(StyleConstants.FULL_HEIGHT)
+    .width(judge?StyleConstants.FULL_WIDTH:0)
+    .height(judge?StyleConstants.FULL_HEIGHT:0)
     .position({ x: 0, y: 0 })
     .expandSafeArea()
   }
@@ -813,13 +871,13 @@ struct Playing {
   // 下载歌曲
   async downloadSong() {
     if (this.song) {
-      ToastUtil.showShort("已添加到下载队列")
+      ToastUtil.showShort($r('app.string.added_to_the_download_queue'))
       SongDownloadManager.downloadSong(
         this.song.id.toString(),
         this.song,
         undefined,
         () => {
-          ToastUtil.showShort("下载完成")
+          ToastUtil.showShort($r('app.string.download_successful'))
         },
       )
     }
@@ -837,7 +895,7 @@ struct Playing {
         }
       },
       {
-        value: '下载歌曲',
+        value: $r('app.string.download_this_song'),
         action: () => {
           animateTo({ duration: 300, curve: Curve.EaseOut }, () => {
             this.downloadSong()
@@ -845,7 +903,7 @@ struct Playing {
         }
       },
       {
-        value: '定时关闭',
+        value: $r('app.string.scheduled_shutdown'),
         action: () => {
           animateTo({ duration: 300, curve: Curve.EaseOut }, () => {
             this.sheetType = "timer";
@@ -859,7 +917,7 @@ struct Playing {
   getNarrowScreenMenu(): MenuElement[] {
     return [
       {
-        value: '下载歌曲',
+        value: $r('app.string.download_this_song'),
         action: () => {
           animateTo({ duration: 300, curve: Curve.EaseOut }, () => {
             this.downloadSong()
@@ -867,7 +925,7 @@ struct Playing {
         }
       },
       {
-        value: '定时关闭',
+        value: $r('app.string.scheduled_shutdown'),
         action: () => {
           animateTo({ duration: 300, curve: Curve.EaseOut }, () => {
             this.sheetType = "timer";
@@ -971,9 +1029,6 @@ struct Playing {
   LyricsPlaceholder() {
     Column() {
       LyricsView({
-        currentTimeMs: this.currentTime,
-        lyrics: this.song?.meta?.lyric?.normal,
-        translationLyrics: this.song?.meta?.lyric?.translation || this.song?.meta?.lyric?.transliteration,
         mode_judge: true
       })
     }
@@ -1132,6 +1187,72 @@ struct Playing {
           this.isBackButtonPressed = true
           this.pageStack.pop()
         })
+      if (this.Pura_X==='1'){
+        Blank().layoutWeight(1)
+        Button({ type: ButtonType.Circle }) {
+          Image(this.isFavorite ? $r('app.media.ic_heart_fill') : $r('app.media.ic_heart'))
+            .width(24)
+            .height(24)
+            .fillColor(this.isFavorite ? '#FF4081' : Color.White)
+            .animation({
+              duration: 300,
+              curve: Curve.EaseOut,
+              iterations: 1,
+              playMode: PlayMode.Normal
+            })
+        }
+        .width(this.buttonSize)
+        .height(this.buttonSize)
+        .backgroundColor(Color.Transparent)
+        .scale({ x: this.isHeartButtonPressed ? 1.3 : 1.0, y: this.isHeartButtonPressed ? 1.3 : 1.0 })
+        .animation({
+          duration: 300,
+          curve: Curve.EaseOut,
+          iterations: 1,
+          playMode: PlayMode.Normal
+        })
+        .onClick(() => {
+          this.isHeartButtonPressed = true
+          animateTo({ duration: 400, curve: Curve.EaseOut }, () => {
+            if (this.song) {
+              SourceAdapter.likeSong(this.song, !this.isFavorite)
+            }
+            EventHelper.postFavoriteToggle("")
+
+            // 重置按钮状态
+            setTimeout(() => {
+              this.isHeartButtonPressed = false
+            }, 400)
+          })
+        })
+
+        // 更多菜单按钮
+        Button({ type: ButtonType.Circle }) {
+          Image($r('app.media.ic_more'))
+            .width(24)
+            .height(24)
+            .fillColor(Color.White)
+        }
+        .width(this.buttonSize)
+        .height(this.buttonSize)
+        .backgroundColor(Color.Transparent)
+        .rotate({ angle: this.isMoreButtonPressed ? 90 : 0 })
+        .animation({
+          duration: 300,
+          curve: Curve.EaseInOut,
+          iterations: 1,
+          playMode: PlayMode.Normal
+        })
+        .onClick(() => {
+          this.isMoreButtonPressed = true
+
+          // 重置按钮状态
+          setTimeout(() => {
+            this.isMoreButtonPressed = false
+          }, 300)
+        })
+        .bindMenu(this.isWideScreen ? this.getWideScreenMenu() : this.getNarrowScreenMenu())
+      }
     }
     .width(StyleConstants.FULL_WIDTH)
     .alignItems(VerticalAlign.Center)
@@ -1142,7 +1263,9 @@ struct Playing {
     NavDestination() {
       FolderStack() {
         // 背景
-        this.BlurBackground()
+
+          this.BlurBackground(this.is_backblur)
+
 
         Column() {
           // 标题栏

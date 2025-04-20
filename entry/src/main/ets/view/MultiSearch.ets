@@ -10,6 +10,7 @@ import { Album, Artist, Playlist, SearchResult, Song } from "../type/Adapter";
 import { cover } from "../util/AdapterHelper";
 import { PlaylistManager } from "../util/PlaylistManager";
 import { PushPathHelper } from "../util/PushPathHelper";
+import { ResourceManager } from "../util/ResourceManager";
 import { ScrollIndexHandler } from "../util/ScrollIndexHandler";
 
 const TAG = 'MultiSearch'
@@ -21,6 +22,7 @@ export struct MultiSearch {
   @State keywords: string = '';
   @State result: SearchResult | null = null;
   @State loading: boolean = false;
+  @State nullResultFlag: boolean = true
   @StorageProp('bottomRect') bottomRect: number = 0
   @StorageProp('topRect') topRect: number = 0
   @StorageProp('winHeight') winHeight: number = 0
@@ -33,7 +35,7 @@ export struct MultiSearch {
   private generatePlaylistMenu(playlist: Playlist) {
     return [
       {
-        value: '播放此歌单',
+        value: $r('app.string.play_this_playlist'),
         action: () => {
           PushPathHelper.loading("Playing", async () => {
             const playlistDetail = await SourceAdapter.getPlaylistDetail(playlist)
@@ -57,7 +59,7 @@ export struct MultiSearch {
   private generateSongMenu(song: Song) {
     return [
       {
-        value: '添加到下一首播放',
+        value: $r('app.string.add_to_play_next'),
         action: () => {
           PlaylistManager.insertSongs([song])
         }
@@ -72,6 +74,7 @@ export struct MultiSearch {
 
   async search() {
     this.loading = true
+    this.nullResultFlag = true
     this.result = await SourceAdapter.search(this.keywords)
     this.loading = false
   }
@@ -89,8 +92,9 @@ export struct MultiSearch {
             }
 
             ListItemGroup({ header: this.SearchComponent() }){
-              if(this.result && this.result.songs && this.result.playlists && this.result.artists && this.result.albums){
-                if(this.result.songs.length > 0 && this.result.playlists.length > 0 && this.result.artists.length > 0 && this.result.albums.length > 0){
+              if(this.result){
+                // 歌曲
+                if(this.isNullResult(this.result.songs)){
                   ListItem(){
                     Segment({
                       title: "歌曲",
@@ -113,7 +117,9 @@ export struct MultiSearch {
                       })
                     }
                   }
-
+                }
+                // 歌单
+                if(this.isNullResult(this.result.playlists)){
                   ListItem(){
                     Segment({
                       title: "歌单",
@@ -136,7 +142,9 @@ export struct MultiSearch {
                       })
                     }
                   }
-
+                }
+                // 艺人
+                if(this.isNullResult(this.result.artists)){
                   ListItem(){
                     Segment({
                       title: "歌手",
@@ -160,7 +168,9 @@ export struct MultiSearch {
                       })
                     }
                   }
-
+                }
+                // 专辑
+                if(this.isNullResult(this.result.albums)){
                   ListItem(){
                     Segment({
                       title: "专辑",
@@ -183,14 +193,16 @@ export struct MultiSearch {
                       })
                     }
                   }
-                } else {
+                }
+                // 如果结果为空
+                if(this.nullResultFlag){
                   ListItem(){
-                    this.EmptySearchResult('白给了呀！莫结果！')
+                    this.EmptySearchResult(ResourceManager.getStringValueSync($r('app.string.search_no_result')))
                   }
                 }
               } else {
                 ListItem(){
-                  this.EmptySearchResult('愣着干啥？开搜啊！')
+                  this.EmptySearchResult(ResourceManager.getStringValueSync($r('app.string.start_search')))
                 }
               }
 
@@ -241,7 +253,7 @@ export struct MultiSearch {
     .expandSafeArea()
     .width(StyleConstants.FULL_WIDTH)
     .height(StyleConstants.FULL_HEIGHT)
-    .systemTransition(NavigationSystemTransitionType.SLIDE_RIGHT)
+    // .systemTransition(NavigationSystemTransitionType.SLIDE_RIGHT)
     .gesture(
       SwipeGesture({
         direction: SwipeDirection.Vertical,
@@ -253,6 +265,19 @@ export struct MultiSearch {
     )
   }
 
+  /**
+   * 判断结果非空公共方法
+   * @param list
+   * @returns
+   */
+  isNullResult(list: Song[] | Playlist[] | Artist[] | Album[] | undefined) {
+    if(list && list.length > 0){
+      this.nullResultFlag = false
+      return true
+    }
+    return false
+  }
+
   getBlankHeight(): Length {
     let sub = px2vp(this.winHeight) - this.groupHeight - 50 - px2vp(this.bottomRect+this.topRect)
     return sub > 0 ? sub : 0
@@ -261,8 +286,8 @@ export struct MultiSearch {
   @Builder
   SearchComponent() {
     Column(){
-      Search({ value: this.keywords, placeholder: '搜索你想要的...' })
-        .searchButton('搜索')
+      Search({ value: this.keywords, placeholder: $r('app.string.search_what_you_want') })
+        .searchButton(ResourceManager.getStringValueSync($r('app.string.search')))
         .onSubmit(async (value: string) => {
           this.keywords = value
           await this.search()

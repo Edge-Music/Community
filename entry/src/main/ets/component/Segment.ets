@@ -5,8 +5,8 @@ import { HorizontalScroll } from "./HorizontalScroll"
 @Component
 export struct Segment {
   @Prop loading: boolean = false
-  title: string = ''
-  actionText: string | undefined = undefined
+  title: string | Resource = ''
+  actionText: string | undefined | Resource = undefined
   onActionClick?: () => void
   radius: string | number = 8
 
@@ -69,11 +69,18 @@ export struct Segment {
             .fontSize(20)
 
           if(this.actionText) {
-            Text(this.actionText)
-              .fontColor($r('app.color.text_secondary'))
-              .fontWeight(StyleConstants.FONT_WEIGHT_FIVE)
-              .fontSize(14)
-              .onClick(this.onActionClick)
+            Row(){
+              Text(this.actionText)
+                .fontColor($r('app.color.text_secondary'))
+                .fontWeight(StyleConstants.FONT_WEIGHT_FIVE)
+                .fontSize(14)
+
+              Image($r('app.media.refresh'))
+                .width(16)
+                .fillColor($r('app.color.text_secondary'))
+                .margin({ left: 2 })
+            }
+            .onClick(this.onActionClick)
           }
         }
         .width(StyleConstants.FULL_WIDTH)

@@ -34,7 +34,7 @@
     },
     {
       "name": "library",
-      "value": "Music Library"
+      "value": "Library"
     },
     {
       "name": "song",
@@ -151,6 +151,314 @@
     {
       "name": "download",
       "value": "Download"
+    },
+    {
+      "name": "all_playlists",
+      "value": "All."
+    },
+    {
+      "name": "custom_playlists",
+      "value": "Cust."
+    },
+    {
+      "name": "collection_playlists",
+      "value": "Coll."
+    },
+    {
+      "name": "hot_songs",
+      "value": "Hot Songs"
+    },
+    {
+      "name": "recommended_artists",
+      "value": "Featured Artists"
+    },
+    {
+      "name": "recommended_playlists",
+      "value": "Featured Playlists"
+    },
+    {
+      "name": "chart",
+      "value": "Chart"
+    },
+    {
+      "name": "rotate",
+      "value": "Rotate"
+    },
+    {
+      "name": "no_download_tasks",
+      "value": "No download tasks."
+    },
+    {
+      "name": "no_recommendations",
+      "value": "No recommendations."
+    },
+    {
+      "name": "search_songs",
+      "value": "Search Songs..."
+    },
+    {
+      "name": "play_all",
+      "value": "Play all"
+    },
+    {
+      "name": "download_all_songs",
+      "value": "Download all"
+    },
+    {
+      "name": "search_what_you_want",
+      "value": "Search for what you want..."
+    },
+    {
+      "name": "start_search",
+      "value": "Please start searching."
+    },
+    {
+      "name": "search_no_result",
+      "value": "No results found."
+    },
+    {
+      "name": "play_this_playlist",
+      "value": "Play this playlist"
+    },
+    {
+      "name": "add_to_play_next",
+      "value": "Add to play next"
+    },
+    {
+      "name": "playing_list",
+      "value": "Playing List"
+    },
+    {
+      "name": "download_this_song",
+      "value": "Download this song"
+    },
+    {
+      "name": "scheduled_shutdown",
+      "value": "Scheduled shutdown"
+    },
+    {
+      "name": "set_scheduled_shutdown",
+      "value": "Set scheduled shutdown"
+    },
+    {
+      "name": "select_time",
+      "value": "Select time"
+    },
+    {
+      "name": "custom_time",
+      "value": "Custom time"
+    },
+    {
+      "name": "minute",
+      "value": "mins"
+    },
+    {
+      "name": "download_successful",
+      "value": "Download successful"
+    },
+    {
+      "name": "added_to_the_download_queue",
+      "value": "Added to the download queue"
+    },
+    {
+      "name": "no_songs_available",
+      "value": "No songs available"
+    },
+    {
+      "name": "no_playback_available",
+      "value": "No playback available"
+    },
+    {
+      "name": "unknown_artist",
+      "value": "Unknown artist"
+    },
+    {
+      "name": "edit",
+      "value": "Edit"
+    },
+    {
+      "name": "delete",
+      "value": "Delete"
+    },
+    {
+      "name": "delete_data_source",
+      "value": "Delete data source"
+    },
+    {
+      "name": "whether_to_delete_data_source",
+      "value": "Whether to delete data source "
+    },
+    {
+      "name": "cancel",
+      "value": "Cancel"
+    },
+    {
+      "name": "data_source_deleted",
+      "value": "Data source deleted."
+    },
+    {
+      "name": "scan_the_QR_code_log",
+      "value": "Alternatively, scan the QR code to log in"
+    },
+    {
+      "name": "reacquire_QR_code",
+      "value": "Reacquire QR code"
+    },
+    {
+      "name": "data_source_name",
+      "value": "Data source name *"
+    },
+    {
+      "name": "please_input_data_source_name",
+      "value": "Please input data source name"
+    },
+    {
+      "name": "data_source_name_address",
+      "value": "Data source name address *"
+    },
+    {
+      "name": "please_input_data_source_name_address",
+      "value": "Please input data source name address"
+    },
+    {
+      "name": "data_source_description",
+      "value": "Data source description"
+    },
+    {
+      "name": "please_input_data_source_description",
+      "value": "Please input data source description"
+    },
+    {
+      "name": "next_step",
+      "value": "Next step"
+    },
+    {
+      "name": "token_credential",
+      "value": "Token credential"
+    },
+    {
+      "name": "please_input_token_credential",
+      "value": "Please input token credential"
+    },
+    {
+      "name": "save_changes",
+      "value": "Save changes"
+    },
+    {
+      "name": "confirm_to_add",
+      "value": "Confirm to add"
+    },
+    {
+      "name": "acquire_QR_code",
+      "value": "Acquire QR code"
+    },
+    {
+      "name": "token_acquired",
+      "value": "Token acquired"
+    },
+    {
+      "name": "add_data_source",
+      "value": "Add data source"
+    },
+    {
+      "name": "add_the_first_data_source",
+      "value": "Add the first data source"
+    },
+    {
+      "name": "please_scan_QR_code",
+      "value": "Please scan QR code"
+    },
+    {
+      "name": "QR_code_generation_failed",
+      "value": "QR code generation failed"
+    },
+    {
+      "name": "please_enter_the_token_credential",
+      "value": "Please enter the token credential"
+    },
+    {
+      "name": "data_source_updated",
+      "value": "Data source updated"
+    },
+    {
+      "name": "data_source_added",
+      "value": "Data source added"
+    },
+    {
+      "name": "no_playable_songs",
+      "value": "No playable songs"
+    },
+    {
+      "name": "removed_from_the_playlist",
+      "value": "Removed from the playlist"
+    },
+    {
+      "name": "quality_standard",
+      "value": "Standard"
+    },
+    {
+      "name": "quality_higher",
+      "value": "Higher"
+    },
+    {
+      "name": "quality_ex_high",
+      "value": "ExHigh"
+    },
+    {
+      "name": "quality_lossless",
+      "value": "Lossless"
+    },
+    {
+      "name": "quality_hires",
+      "value": "Hi-Res"
+    },
+    {
+      "name": "system_rotary_switch",
+      "value": "Controlled By System Rotary Switch"
+    },
+    {
+      "name": "custom_settings",
+      "value": "Custom Settings"
+    },
+    {
+      "name": "mini_music_control_bottom",
+      "value": "Mini Music Control At Bottom"
+    },
+    {
+      "name": "swipe_cover_switch_songs",
+      "value": "Swipe Cover To Switch Songs"
+    },
+    {
+      "name": "no_download_link_found",
+      "value": "No download link found"
+    },
+    {
+      "name": "release_refresh",
+      "value": "Refresh←Release"
+    },
+    {
+      "name": "release_settings",
+      "value": "Settings←Release"
+    },
+    {
+      "name": "release_search",
+      "value": "Search←Release"
+    },
+    {
+      "name": "pull_refresh",
+      "value": "Refresh←Pull"
+    },
+    {
+      "name": "release_back",
+      "value": "Back←Release"
+    },
+    {
+      "name": "blank",
+      "value": ""
+    },
+    {
+      "name": "confirm",
+      "value": "Confirm"
     }
   ]
 }

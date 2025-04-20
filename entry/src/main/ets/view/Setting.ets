@@ -14,6 +14,7 @@ import { About } from "./About";
 import {Personalized_settings}from '../view/Personalized_settings'
 import { HeaderAnimation } from "../component/HeaderAnimation";
 import { ScrollIndexHandler } from "../util/ScrollIndexHandler";
+import { ResourceManager } from "../util/ResourceManager";
 
 const TAG = 'Setting'
 
@@ -44,7 +45,7 @@ export struct Setting {
   @State qrCodeUnikey: string = ''
   @State qrCodeStatus: number = 0 // -1 过期，0 等待扫码，1 等待确认，2 授权登录成功
   @State isCheckingQRCode: boolean = false
-  @State qrCodeStatusText: string = '请扫描二维码'
+  @State qrCodeStatusText: string | Resource = $r('app.string.please_scan_QR_code')
   @State tokenFromQR: string = ''
   @State qrCodeVisible: boolean = false
   @State qrCodeScale: number = 0.8
@@ -58,6 +59,7 @@ export struct Setting {
   @StorageProp('bottomRect') bottomRect: number = 0;
   @StorageProp('topRect') topRect: number = 0;
   @State groupHeight: number = 0
+  @State  Pura_X:boolean =  PreferencesCache.getUserPreference('is_Pura_X', '0')==='1'? true:false//pura_x尝试适配
   @State scrollIndexHandler: ScrollIndexHandler = new ScrollIndexHandler({
     onIndexChange: (index): void => this.onMenuIconClick(index),
     componentTag: TAG
@@ -83,7 +85,7 @@ export struct Setting {
   private connectToDataSource() {
     const cookie = this.formData.auth?.token
     if (!cookie) {
-      ToastUtil.showShort('请填写令牌凭证')
+      ToastUtil.showShort($r('app.string.please_enter_the_token_credential'))
       return
     }
 
@@ -93,13 +95,13 @@ export struct Setting {
           // 编辑现有数据源
           PreferencesCache.updateUserDataSource(source)
           PreferencesCache.updateShowUserDataSource(source)
-          ToastUtil.showShort('数据源已更新')
+          ToastUtil.showShort($r('app.string.data_source_updated'))
         } else {
           // 添加新数据源
           PreferencesCache.addUserDataSource(source)
           // 添加展示数据源
           PreferencesCache.addShowUserDataSource(source)
-          ToastUtil.showShort('数据源已添加')
+          ToastUtil.showShort($r('app.string.data_source_added'))
         }
 
         Promise.all([
@@ -130,7 +132,7 @@ export struct Setting {
     this.qrCodeUnikey = ''
     this.qrCodeStatus = 0
     this.tokenFromQR = ''
-    this.qrCodeStatusText = '请扫描二维码'
+    this.qrCodeStatusText = $r('app.string.please_scan_QR_code')
     this.qrCodeVisible = false
     this.qrCodeScale = 0.8
   }
@@ -157,7 +159,7 @@ export struct Setting {
       // 生成二维码
       const qrCode = await SourceAdapter.createQRCode(this.formData, this.qrCodeUnikey)
       this.qrCodeUrl = qrCode.qrimg
-      this.qrCodeStatusText = '请扫描二维码'
+      this.qrCodeStatusText = $r('app.string.please_scan_QR_code')
 
       // 使用setTimeout确保DOM先更新，再开始动画
       setTimeout(() => {
@@ -173,8 +175,8 @@ export struct Setting {
       this.startCheckingQRCode()
     } catch (error) {
       LogUtil.error('QRCode', `Failed to generate QR code: ${error.message}`)
-      this.qrCodeStatusText = '二维码生成失败'
-      ToastUtil.showShort(`二维码生成失败: ${error.message}`)
+      this.qrCodeStatusText = $r('app.string.QR_code_generation_failed')
+      ToastUtil.showShort(`${$r('app.string.QR_code_generation_failed')}: ${error.message}`)
     }
   }
 
@@ -254,7 +256,7 @@ export struct Setting {
         .width(20)
         .height(20)
         .fillColor($r('app.color.icon_normal'))
-      Text(this.adapters?.length ? '添加数据源' : '添加第一个数据源')
+      Text(this.adapters?.length ? $r('app.string.add_data_source') : $r('app.string.add_the_first_data_source'))
         .fontSize(14)
         .fontColor($r('app.color.text_secondary'))
         .margin({ left: 8 })
@@ -287,7 +289,7 @@ export struct Setting {
       this.qrCodeUnikey = ''
       this.qrCodeStatus = 0
       this.tokenFromQR = ''
-      this.qrCodeStatusText = '请扫描二维码'
+      this.qrCodeStatusText = $r('app.string.please_scan_QR_code')
       this.qrCodeVisible = false
       this.qrCodeScale = 0.8
     })
@@ -301,7 +303,7 @@ export struct Setting {
         .opacity(0.5)
         .margin({ top: 8, bottom: 8 })
 
-      Text('或使用二维码扫码登录')
+      Text($r('app.string.scan_the_QR_code_log'))
         .fontSize(14)
         .fontColor($r('app.color.text_secondary'))
         .textAlign(TextAlign.Center)
@@ -310,7 +312,7 @@ export struct Setting {
       // 管理按钮和二维码的显示逻辑
       if (!this.qrCodeUrl || !this.qrCodeVisible) {
         // 显示按钮
-        Button('获取二维码')
+        Button($r('app.string.acquire_QR_code'))
           .width(140)
           .height(40)
           .backgroundColor($r('app.color.button_background'))
@@ -355,7 +357,7 @@ export struct Setting {
       // 状态相关的按钮
       if (this.qrCodeStatus === 2 && this.tokenFromQR) {
         Row() {
-          Text('已获取令牌')
+          Text($r('app.string.token_acquired'))
             .fontSize(14)
             .fontColor($r('app.color.success'))
 
@@ -375,7 +377,7 @@ export struct Setting {
       }
 
       if (this.qrCodeStatus === -1) {
-        Button('重新获取二维码')
+        Button($r('app.string.reacquire_QR_code'))
           .width(140)
           .height(40)
           .backgroundColor($r('app.color.button_background'))
@@ -405,14 +407,14 @@ export struct Setting {
       // 第一页表单
       Column({ space: 16 }) {
         Column({ space: 8 }) {
-          Text('数据源名称 *')
+          Text($r('app.string.data_source_name'))
             .fontSize(14)
             .fontColor($r('app.color.text_secondary'))
             .opacity(this.currentStep === 0 ? 1 : 0)
             .translate({ x: this.currentStep === 0 ? 0 : '-20%' })
             .animation({ delay: 50, duration: 250, curve: Curve.FastOutSlowIn })
 
-          TextInput({ placeholder: '请输入数据源名称', text: $$this.formData.name })
+          TextInput({ placeholder: $r('app.string.please_input_data_source_name'), text: $$this.formData.name })
             .width(StyleConstants.FULL_WIDTH)
             .opacity(this.currentStep === 0 ? 1 : 0)
             .translate({ x: this.currentStep === 0 ? 0 : '-20%' })
@@ -420,14 +422,14 @@ export struct Setting {
         }
 
         Column({ space: 8 }) {
-          Text('数据源地址 *')
+          Text($r('app.string.data_source_name_address'))
             .fontSize(14)
             .fontColor($r('app.color.text_secondary'))
             .opacity(this.currentStep === 0 ? 1 : 0)
             .translate({ x: this.currentStep === 0 ? 0 : '-20%' })
             .animation({ delay: 150, duration: 250, curve: Curve.FastOutSlowIn })
 
-          TextInput({ placeholder: '请输入数据源地址', text: $$this.formData.url })
+          TextInput({ placeholder: $r('app.string.please_input_data_source_name_address'), text: $$this.formData.url })
             .width(StyleConstants.FULL_WIDTH)
             .opacity(this.currentStep === 0 ? 1 : 0)
             .translate({ x: this.currentStep === 0 ? 0 : '-20%' })
@@ -435,14 +437,14 @@ export struct Setting {
         }
 
         Column({ space: 8 }) {
-          Text('数据源描述')
+          Text($r('app.string.data_source_description'))
             .fontSize(14)
             .fontColor($r('app.color.text_secondary'))
             .opacity(this.currentStep === 0 ? 1 : 0)
             .translate({ x: this.currentStep === 0 ? 0 : '-20%' })
             .animation({ delay: 250, duration: 250, curve: Curve.FastOutSlowIn })
 
-          TextArea({ placeholder: '请输入数据源描述', text: $$this.formData.description })
+          TextArea({ placeholder: $r('app.string.please_input_data_source_description'), text: $$this.formData.description })
             .width(StyleConstants.FULL_WIDTH)
             .height(100)
             .opacity(this.currentStep === 0 ? 1 : 0)
@@ -452,7 +454,7 @@ export struct Setting {
 
         Row() {
           Blank()
-          Button('下一步')
+          Button($r('app.string.next_step'))
             .width(120)
             .height(40)
             .backgroundColor($r('app.color.button_background'))
@@ -508,14 +510,14 @@ export struct Setting {
         .alignItems(VerticalAlign.Center)
 
         Column({ space: 8 }) {
-          Text('令牌凭证')
+          Text($r('app.string.token_credential'))
             .fontSize(14)
             .fontColor($r('app.color.text_secondary'))
             .opacity(this.currentStep === 1 ? 1 : 0)
             .translate({ x: this.currentStep === 1 ? 0 : '20%' })
             .animation({ delay: 100, duration: 250, curve: Curve.FastOutSlowIn })
 
-          TextInput({ placeholder: '请输入令牌凭证', text: this.tokenFromQR || (this.formData.auth?.token || '') })
+          TextInput({ placeholder: $r('app.string.please_input_token_credential'), text: this.tokenFromQR || (this.formData.auth?.token || '') })
             .width(StyleConstants.FULL_WIDTH)
             .type(InputType.Password)
             .onChange((value) => {
@@ -531,11 +533,10 @@ export struct Setting {
         .margin({ top: 16 })
 
         this.QRCodeSection()
-
-        Blank()
+        if (!this.Pura_X){Blank()}
 
         Row({ space: 8 }) {
-          Button(this.isEditing ? '保存修改' : '确认添加')
+          Button(this.isEditing ? $r('app.string.save_changes') : $r('app.string.confirm_to_add'))
             .width(120)
             .height(40)
             .backgroundColor($r('app.color.button_background'))
@@ -567,22 +568,22 @@ export struct Setting {
   @Builder
   AdapterItemMenu(adapter: SourceConfig) {
     Menu() {
-      MenuItem({ content: '编辑', labelInfo: '' })
+      MenuItem({ content: $r('app.string.edit'), labelInfo: '' })
         .onClick(() => {
           this.editSource(adapter)
         })
-      MenuItem({ content: '删除', labelInfo: '' })
+      MenuItem({ content: $r('app.string.delete'), labelInfo: '' })
         .onClick(() => {
           DialogUtil.showPrimaryDialog({
-            title: '删除数据源',
-            message: `是否删除数据源"${adapter.name}"？`,
-            primaryButton: "取消",
-            secondaryButton: "删除",
+            title: $r('app.string.delete_data_source'),
+            message: ResourceManager.getStringValueSync($r('app.string.whether_to_delete_data_source')) +`[${adapter.name}]？`,
+            primaryButton: $r('app.string.cancel'),
+            secondaryButton: $r('app.string.delete'),
             onAction: (action) => {
               if (action == DialogAction.TWO) {
                 PreferencesCache.deleteUserDataSource(adapter.id)
                 PreferencesCache.deleteShowUserDataSource(adapter.id)
-                ToastUtil.showShort('数据源已删除')
+                ToastUtil.showShort($r('app.string.data_source_deleted'))
               }
             }
           })
@@ -743,8 +744,8 @@ export struct Setting {
     .height(StyleConstants.FULL_HEIGHT)
     .bindSheet($$this.isShow, this.sheet, {
       showClose: this.nowSheet !== "form",
-      height:SheetSize.FIT_CONTENT,
-      detents: [SheetSize.MEDIUM],
+      height:this.Pura_X?SheetSize.LARGE:SheetSize.FIT_CONTENT,
+      detents:this.Pura_X? [SheetSize.LARGE]:[SheetSize.MEDIUM],
       preferType: this.currentBreakpoint === BreakpointConstants.BREAKPOINT_SM ? SheetType.BOTTOM : SheetType.CENTER
     })
     .gesture(

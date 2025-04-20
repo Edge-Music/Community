@@ -9,6 +9,7 @@ import { EventHelper } from './EventHelper';
 import { PreferencesCache } from './PreferenceCache';
 import { SourceAdapter } from '../adapter';
 import { Song } from '../type/Adapter';
+import LyricsManager from './LyricsManager';
 
 // 定义回调函数的类型
 export interface PlayerCallbacks {
@@ -444,27 +445,32 @@ class AVPlayerManager {
 
       switch (state) {
         case 'initialized':
+          LyricsManager.init()
           player.prepare();
           break;
         case 'prepared':
+          LyricsManager.reset()
           this.currentPlaybackState = avSession.PlaybackState.PLAYBACK_STATE_PAUSE;
           this.updatePlaybackState(avSession.PlaybackState.PLAYBACK_STATE_PAUSE);
           const duration = player.duration;
           this.triggerDurationChange(duration);
           break;
         case 'playing':
+          LyricsManager.init()
           this.isPlayingBeforeInterrupt = true;
           this.currentPlaybackState = avSession.PlaybackState.PLAYBACK_STATE_PLAY;
           this.updatePlaybackState(avSession.PlaybackState.PLAYBACK_STATE_PLAY);
           this.triggerPlay();
           break;
         case 'paused':
+          LyricsManager.reset()
           this.isPlayingBeforeInterrupt = false;
           this.currentPlaybackState = avSession.PlaybackState.PLAYBACK_STATE_PAUSE;
           this.updatePlaybackState(avSession.PlaybackState.PLAYBACK_STATE_PAUSE);
           this.triggerPause();
           break;
         case 'completed':
+          LyricsManager.reset()
           const nextSong = PlaylistManager.playNext()
           if (nextSong) {
             PlaylistManager.playSong(nextSong)
@@ -475,6 +481,7 @@ class AVPlayerManager {
           this.triggerCompleted();
           break;
         case 'stopped':
+          LyricsManager.reset()
           this.isPlayingBeforeInterrupt = false;
           player.reset();
           this.currentPlaybackState = avSession.PlaybackState.PLAYBACK_STATE_IDLE;
@@ -492,6 +499,7 @@ class AVPlayerManager {
     });
 
     player.on('error', (error: Error) => {
+      LyricsManager.reset()
       this.triggerError(error);
     });
 

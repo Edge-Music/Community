@@ -57,7 +57,7 @@ export class ScrollIndexHandler {
     this.currentIndex = -1
   }
 
-  getText(): string {
+  getText(): Resource {
     return (slideTypeByTagConfigMap[this.config.componentTag] ?? slideTypeByTagConfigMap[this.defaultTag]).getActionText(this.currentIndex)
   }
 }

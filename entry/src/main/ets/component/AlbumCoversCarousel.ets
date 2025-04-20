@@ -103,7 +103,7 @@ export struct AlbumCoversCarousel {
     Column({ space: this.spacing }) {
       if (this.songs.length === 0) {
         // 显示空状态
-        Text("暂无歌曲")
+        Text($r('app.string.no_songs_available'))
           .fontSize(16)
           .fontColor("#999999")
           .margin(20)

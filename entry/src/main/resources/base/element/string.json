@@ -151,6 +151,319 @@
     {
       "name": "download",
       "value": "下载"
+    },
+    {
+      "name": "all_playlists",
+      "value": "所有"
+    },
+    {
+      "name": "custom_playlists",
+      "value": "自建"
+    },
+    {
+      "name": "collection_playlists",
+      "value": "收藏"
+    },
+
+    {
+      "name": "hot_songs",
+      "value": "热门歌曲"
+    },
+    {
+      "name": "recommended_artists",
+      "value": "推荐艺人"
+    },
+    {
+      "name": "chart",
+      "value": "排行榜"
+    },
+    {
+      "name": "recommended_playlists",
+      "value": "推荐歌单"
+    },
+    {
+      "name": "rotate",
+      "value": "换一批"
+    },
+    {
+      "name": "no_download_tasks",
+      "value": "暂无下载任务"
+    },
+    {
+      "name": "no_recommendations",
+      "value": "当前音源暂无推荐"
+    },
+    {
+      "name": "search_songs",
+      "value": "搜索歌单内歌曲..."
+    },
+    {
+      "name": "play_all",
+      "value": "播放全部"
+    },
+    {
+      "name": "download_all_songs",
+      "value": "下载全部歌曲"
+    },
+    {
+      "name": "search_what_you_want",
+      "value": "搜索你想要的..."
+    },
+    {
+      "name": "start_search",
+      "value": "愣着干啥？开搜啊！"
+    },
+    {
+      "name": "search_no_result",
+      "value": "白给了呀！莫结果！"
+    },
+    {
+      "name": "play_this_playlist",
+      "value": "播放此歌单"
+    },
+    {
+      "name": "add_to_play_next",
+      "value": "添加到下一首"
+    },
+    {
+      "name": "playing_list",
+      "value": "播放列表"
+    },
+    {
+      "name": "download_this_song",
+      "value": "下载歌曲"
+    },
+    {
+      "name": "scheduled_shutdown",
+      "value": "定时关闭"
+    },
+    {
+      "name": "set_scheduled_shutdown",
+      "value": "设置定时关闭"
+    },
+    {
+      "name": "select_time",
+      "value": "选择时间"
+    },
+    {
+      "name": "custom_time",
+      "value": "自定义时间"
+    },
+    {
+      "name": "minute",
+      "value": "分钟"
+    },
+    {
+      "name": "download_successful",
+      "value": "下载完成"
+    },
+    {
+      "name": "added_to_the_download_queue",
+      "value": "添加到下载队列"
+    },
+    {
+      "name": "no_songs_available",
+      "value": "暂无歌曲"
+    },
+    {
+      "name": "no_lyric_available",
+      "value": "暂无歌词"
+    },
+    {
+      "name": "no_playback_available",
+      "value": "暂无播放"
+    },
+    {
+      "name": "unknown_artist",
+      "value": "未知艺术家"
+    },
+    {
+      "name": "edit",
+      "value": "编辑"
+    },
+    {
+      "name": "delete",
+      "value": "删除"
+    },
+    {
+      "name": "delete_data_source",
+      "value": "删除数据源"
+    },
+    {
+      "name": "whether_to_delete_data_source",
+      "value": "是否删除数据源"
+    },
+    {
+      "name": "cancel",
+      "value": "取消"
+    },
+    {
+      "name": "data_source_deleted",
+      "value": "数据源已删除"
+    },
+    {
+      "name": "data_source_name",
+      "value": "数据源名称 *"
+    },
+    {
+      "name": "please_input_data_source_name",
+      "value": "请输入数据源名称"
+    },
+    {
+      "name": "data_source_name_address",
+      "value": "数据源地址 *"
+    },
+    {
+      "name": "please_input_data_source_name_address",
+      "value": "请输入数据源地址"
+    },
+    {
+      "name": "data_source_description",
+      "value": "数据源描述"
+    },
+    {
+      "name": "please_input_data_source_description",
+      "value": "请输入数据源描述"
+    },
+    {
+      "name": "next_step",
+      "value": "下一步"
+    },
+    {
+      "name": "token_credential",
+      "value": "令牌凭证"
+    },
+    {
+      "name": "please_input_token_credential",
+      "value": "请输入令牌凭证"
+    },
+    {
+      "name": "save_changes",
+      "value": "保存修改"
+    },
+    {
+      "name": "confirm_to_add",
+      "value": "确认添加"
+    },
+    {
+      "name": "token_acquired",
+      "value": "令牌已获取"
+    },
+    {
+      "name": "reacquire_QR_code",
+      "value": "重新获取二维码"
+    },
+    {
+      "name": "scan_the_QR_code_log",
+      "value": "或使用二维码扫码登录"
+    },
+    {
+      "name": "acquire_QR_code",
+      "value": "获取二维码"
+    },
+    {
+      "name": "add_data_source",
+      "value": "添加数据源"
+    },
+    {
+      "name": "add_the_first_data_source",
+      "value": "添加第一个数据源"
+    },
+    {
+      "name": "please_scan_QR_code",
+      "value": "请扫描二维码"
+    },
+    {
+      "name": "QR_code_generation_failed",
+      "value": "二维码生成失败"
+    },
+    {
+      "name": "please_enter_the_token_credential",
+      "value": "请输入令牌凭证"
+    },
+    {
+      "name": "data_source_updated",
+      "value": "数据源已更新"
+    },
+    {
+      "name": "data_source_added",
+      "value": "数据源已添加"
+    },
+    {
+      "name": "no_playable_songs",
+      "value": "此歌单无可播放歌曲"
+    },
+    {
+      "name": "removed_from_the_playlist",
+      "value": "已从播放列表中删除"
+    },
+    {
+      "name": "quality_standard",
+      "value": "标准"
+    },
+    {
+      "name": "quality_higher",
+      "value": "较高"
+    },
+    {
+      "name": "quality_ex_high",
+      "value": "极高"
+    },
+    {
+      "name": "quality_lossless",
+      "value": "无损"
+    },
+    {
+      "name": "quality_hires",
+      "value": "Hi-Res"
+    },
+    {
+      "name": "custom_settings",
+      "value": "个性化设置"
+    },
+    {
+      "name": "system_rotary_switch",
+      "value": "受系统旋转开关控制"
+    },
+    {
+      "name": "mini_music_control_bottom",
+      "value": "Mini播控置底"
+    },
+    {
+      "name": "swipe_cover_switch_songs",
+      "value": "滑动封面切歌"
+    },
+    {
+      "name": "no_download_link_found",
+      "value": "没有找到下载链接"
+    },
+    {
+      "name": "release_refresh",
+      "value": "刷新←释放"
+    },
+    {
+      "name": "release_settings",
+      "value": "设置←释放"
+    },
+    {
+      "name": "release_search",
+      "value": "搜索←释放"
+    },
+    {
+      "name": "pull_refresh",
+      "value": "刷新←下拉"
+    },
+    {
+      "name": "release_back",
+      "value": "上一页←释放"
+    },
+    {
+      "name": "blank",
+      "value": ""
+    },
+    {
+      "name": "confirm",
+      "value": "确认"
     }
   ]
 }

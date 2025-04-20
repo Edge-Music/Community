@@ -1,21 +1,22 @@
 import { ID, Song, SourceConfig } from "../type/Adapter";
 import { PreferencesUtil } from '@pura/harmony-utils';
+import { ResourceManager } from "./ResourceManager";
 
 // 比特率类型
 export type BitrateType = 128000 | 192000 | 320000 | 350000 | 999000;
 
 export interface QualityLevel {
   level: string;
-  description: string;
+  description: string | Resource
   bitrate: BitrateType;
 }
 
 export const qualityLevels: QualityLevel[] = [
-  { level: 'standard', description: '标准', bitrate: 128000 },
-  { level: 'higher', description: '较高', bitrate: 192000 },
-  { level: 'exhigh', description: '极高', bitrate: 320000 },
-  { level: 'lossless', description: '无损', bitrate: 350000 },
-  { level: 'hires', description: 'Hi-Res', bitrate: 999000 }
+  { level: 'standard', description: $r('app.string.quality_standard'), bitrate: 128000 },
+  { level: 'higher', description: $r('app.string.quality_higher'), bitrate: 192000 },
+  { level: 'exhigh', description: $r('app.string.quality_ex_high'), bitrate: 320000 },
+  { level: 'lossless', description: $r('app.string.quality_lossless'), bitrate: 350000 },
+  { level: 'hires', description: $r('app.string.quality_hires'), bitrate: 999000 }
 ];
 
 /**

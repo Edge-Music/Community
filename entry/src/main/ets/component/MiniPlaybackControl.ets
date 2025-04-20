@@ -128,7 +128,7 @@ export struct MiniPlaybackControl {
   PlayListBuilder() {
     Column() {
       // 播放列表内容
-      Text("播放列表")
+      Text($r('app.string.playing_list'))
         .fontSize(18)
         .fontWeight(StyleConstants.FONT_WEIGHT_SEVEN)
         .fontColor($r('app.color.text_title'))
@@ -181,7 +181,7 @@ export struct MiniPlaybackControl {
 
           // 歌曲信息
           Column() {
-            Text(this.currentSong?.name || '暂无播放')
+            Text(this.currentSong?.name || $r('app.string.no_playback_available'))
               .fontSize(16)
               .fontWeight(FontWeight.Medium)
               .fontColor($r('app.color.text_title'))
@@ -189,7 +189,7 @@ export struct MiniPlaybackControl {
               .textOverflow({ overflow: TextOverflow.Ellipsis })
 
             if (this.currentSong) {
-              Text(this.currentSong.artists?.map(artist => artist.name).join(' / ') || '未知艺术家')
+              Text(this.currentSong.artists?.map(artist => artist.name).join(' / ') || $r('app.string.unknown_artist'))
                 .fontSize(12)
                 .fontColor($r('app.color.text_primary'))
                 .maxLines(1)

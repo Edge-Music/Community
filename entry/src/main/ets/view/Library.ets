@@ -7,14 +7,13 @@ import { PlaylistList } from "../component/PlaylistList";
 import { MiniPlaybackControl } from "../component/MiniPlaybackControl";
 import FormUtils from "../util/FormUtils"
 import { cover } from "../util/AdapterHelper";
-import { promptAction } from "@kit.ArkUI";
+import { promptAction, UIContext } from "@kit.ArkUI";
 import { PreferencesCache } from "../util/PreferenceCache";
 import { HeaderAnimation } from "../component/HeaderAnimation";
 import { ScrollIndexHandler } from "../util/ScrollIndexHandler";
+import { ResponseCacheUtil } from "../util/ResponseCacheUtil";
 
-const subTitles: string[] = ['所有', '自建', '收藏']
 const TAG = 'Library'
-
 @Builder
 export function LibraryBuilder(){
   Library()
@@ -22,6 +21,7 @@ export function LibraryBuilder(){
 
 @Component
 struct Library {
+  subTitles: Resource[] = [$r('app.string.all_playlists'), $r('app.string.custom_playlists'), $r('app.string.collection_playlists')]
   @State itemHeight: number = 0
   @Consume('NavPathStack') pageStack: NavPathStack;
   @StorageLink('user_playlist') playlists: Playlist[] = [];
@@ -44,7 +44,6 @@ struct Library {
   @State scaleY: number = 1.0
   @State scrollIndexHandler: ScrollIndexHandler = new ScrollIndexHandler({
     onIndexChange: (index) => {
-      console.log("currentIndex:"+index)
       this.onMenuIconClick(index)
     },
     componentTag: TAG
@@ -68,14 +67,16 @@ struct Library {
 
     try {
       this.playlists = await SourceAdapter.getUserPlaylist();
+      ResponseCacheUtil.clear()
     } finally {
       this.isLoading = false;
     }
   }
 
   aboutToAppear(): void {
-    if (this.playlists[1]?.cover)
+    if (this.playlists[1]?.cover){
       FormUtils.updateRecommendedCards(this.playlists[1].cover)
+    }
   }
 
   @Builder
@@ -112,7 +113,7 @@ struct Library {
       .animation({ duration: 500, curve: Curve.FastOutSlowIn })
 
       Row({ space: 15 }){
-        ForEach(subTitles, (str: string, index: number) => {
+        ForEach(this.subTitles, (str: string, index: number) => {
           Text(str)
             .fontColor($r('app.color.text_secondary'))
             .fontWeight(FontWeight.Bold)
@@ -140,14 +141,16 @@ struct Library {
 
   @Builder
   ButtonS(){
-    Row(){
-      Image(cover(this.adapters[this.sIndex].auth?.user?.avatar ?? '', 200))
-        .shadow(ShadowStyle.OUTER_DEFAULT_XS)
+    Button({ type: ButtonType.Circle }){
+      Image(cover(this.adapters[this.sIndex].auth?.user?.avatar, 200) ?? $r('app.media.portrait'))
         .width(35)
+        .height(35)
         .borderRadius(17.5)
     }
+    .shadow(ShadowStyle.OUTER_DEFAULT_XS)
+    .backgroundColor('transparent')
     .onClick(() => {
-      this.isExpanded = !this.isExpanded;
+      this.isExpanded = !this.isExpanded
     })
     .bindContextMenu(this.isExpanded, this.SwitchSourceMenu(),{
       onDisappear: () => {
@@ -378,7 +381,7 @@ struct Library {
       .width(StyleConstants.FULL_WIDTH)
       .height(StyleConstants.FULL_HEIGHT)
     }
-    .systemTransition(NavigationSystemTransitionType.SLIDE_RIGHT)
+    // .systemTransition(NavigationSystemTransitionType.SLIDE_RIGHT)
     .hideToolBar(true)
     .hideTitleBar(true)
     .backgroundColor($r('app.color.page_background'))

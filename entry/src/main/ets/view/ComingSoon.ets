@@ -31,7 +31,7 @@ export struct ComingSoon {
           // 按钮
           Button() {
             Row() {
-              Text("返回")
+              Text($r('app.string.back'))
                 .fontSize(16)
                 .fontWeight(FontWeight.Medium)
                 .fontColor(Color.White)

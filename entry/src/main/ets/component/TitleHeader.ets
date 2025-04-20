@@ -74,7 +74,7 @@ export struct TitleHeader {
         .width(StyleConstants.FULL_WIDTH)
         .alignItems(VerticalAlign.Center)
         Row() {
-          Text('返回')
+          Text($r('app.string.back'))
             .fontColor($r('app.color.text_title'))
             .fontWeight(StyleConstants.FONT_WEIGHT_SEVEN)
             .fontSize($r('app.float.title_font_size'))
