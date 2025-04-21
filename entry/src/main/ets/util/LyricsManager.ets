@@ -24,7 +24,7 @@ class LyricsManager {
   private hasTranslation: boolean = false
   private currentTimeMs: number = 0
   private parsedLyrics: Array<LyricsLine> = []
-  private lyricsTimer: number = 0
+  private lyricsTimer: number = -1
   private currentIndex: number = 0
   private readonly PRE_HIGHLIGHT_TIME: number = 500 // 提前切换时间
 
@@ -41,7 +41,7 @@ class LyricsManager {
     this.song = undefined
     this.originalLyrics = ''
     this.translatedLyrics = ''
-    this.lyricsTimer = 0
+    this.lyricsTimer = -1
     this.currentTimeMs = 0
     this.parsedLyrics = []
     this.currentIndex = 0
@@ -51,7 +51,7 @@ class LyricsManager {
     const player = await avPlayerManager.getAVPlayerInstance()
     this.currentTimeMs = player.currentTime
 
-    if(this.lyricsTimer === 0){
+    if(this.lyricsTimer === -1){
       this.lyricsTimer = setInterval(() => {
         this.currentTimeMs = player.currentTime
         this.updateCurrentLyric()
