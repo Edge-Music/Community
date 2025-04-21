@@ -31,7 +31,7 @@ export struct LyricsView {
   private readonly SCROLL_ANIMATION_DURATION: number = 400
 
   aboutToAppear() {
-
+    this.scrollToLyric(this.currentLyricsIndex)
   }
 
   // 监听当前播放时间更新
