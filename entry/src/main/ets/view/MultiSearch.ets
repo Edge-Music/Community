@@ -254,15 +254,6 @@ export struct MultiSearch {
     .width(StyleConstants.FULL_WIDTH)
     .height(StyleConstants.FULL_HEIGHT)
     // .systemTransition(NavigationSystemTransitionType.SLIDE_RIGHT)
-    .gesture(
-      SwipeGesture({
-        direction: SwipeDirection.Vertical,
-      }).onAction((event) => {
-        if (event.angle >= 0) {
-          this.pageStack.pop()
-        }
-      })
-    )
   }
 
   /**
@@ -328,7 +319,7 @@ export struct MultiSearch {
   }
 
   onMenuIconClick(index: number) {
-    if (index === 0) {
+    if (index === 0 && this.pageStack.size() > 1) {
       this.pageStack.pop();
     } else if (index === 1) {
       // 触发other

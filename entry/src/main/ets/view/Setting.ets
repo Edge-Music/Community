@@ -71,7 +71,7 @@ export struct Setting {
   }
 
   onMenuIconClick(index: number) {
-    if (index === 0) {
+    if (index === 0 && this.pageStack.size() > 1) {
       this.pageStack.pop()
     }
   }
@@ -748,15 +748,6 @@ export struct Setting {
       detents:this.Pura_X? [SheetSize.LARGE]:[SheetSize.MEDIUM],
       preferType: this.currentBreakpoint === BreakpointConstants.BREAKPOINT_SM ? SheetType.BOTTOM : SheetType.CENTER
     })
-    .gesture(
-      SwipeGesture({
-        direction: SwipeDirection.Vertical,
-      }).onAction((event) => {
-        if (event.angle >= 0) {
-          this.pageStack.pop()
-        }
-      })
-    )
   }
 
   getBlankHeight(): Length {

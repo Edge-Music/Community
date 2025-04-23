@@ -78,7 +78,7 @@ export struct PlayList {
   }
 
   onMenuIconClick(index: number) {
-    if (index === 0) {
+    if (index === 0 && this.pageStack.size() > 1) {
       this.pageStack.pop()
     }
   }
@@ -558,18 +558,6 @@ export struct PlayList {
     .expandSafeArea()
     .width(StyleConstants.FULL_WIDTH)
     .height(StyleConstants.FULL_HEIGHT)
-    .gesture(
-      SwipeGesture({
-        direction: SwipeDirection.Vertical,
-      }).onAction((event) => {
-        if (event.angle < 0) {
-          // 向上滑
-        } else {
-          // 向下滑，返回上一页
-          this.pageStack.pop()
-        }
-      })
-    )
   }
 
   @Builder

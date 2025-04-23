@@ -219,8 +219,13 @@ export struct PlaylistView {
               .padding({ top: 16, bottom: 16 })
             }
           }
+
+          ListItem(){
+            Column(){
+              Blank().height(64)
+            }
+          }
         }
-        .margin({ bottom: 64 })
         .width(StyleConstants.FULL_WIDTH)
         .height(StyleConstants.FULL_HEIGHT)
         .layoutWeight(1)
