@@ -6,13 +6,15 @@ import { ResourceManager } from "./ResourceManager";
 export class LyricsLine {
   time: number; // 时间点（毫秒）
   text: string; // 原文歌词
-  translation?: string; // 翻译/音译
+  translation?: string; // 翻译
+  transliteration?: string; //音译
   showTranslation?: boolean; // 是否显示翻译
 
-  constructor(time: number, text: string, translation?: string, showTranslation?: boolean) {
+  constructor(time: number, text: string, translation?: string, transliteration?: string, showTranslation?: boolean) {
     this.time = time;
     this.text = text;
     this.translation = translation;
+    this.transliteration = transliteration;
     this.showTranslation = showTranslation;
   }
 }
@@ -21,7 +23,9 @@ class LyricsManager {
   private song: Song | undefined
   private originalLyrics: string = ''
   private translatedLyrics: string = ''
+  private transliteratedLyrics: string = ''
   private hasTranslation: boolean = false
+  private hasTransliteration: boolean = false
   private currentTimeMs: number = 0
   private parsedLyrics: Array<LyricsLine> = []
   private lyricsTimer: number = -1
@@ -31,7 +35,8 @@ class LyricsManager {
   async init(){
     this.song = AppStorage.get<Song>('current_playing_song')
     this.originalLyrics = this.song?.meta?.lyric?.normal ?? ''
-    this.translatedLyrics = (this.song?.meta?.lyric?.translation || this.song?.meta?.lyric?.transliteration) ?? ''
+    this.translatedLyrics = this.song?.meta?.lyric?.translation ?? ''
+    this.transliteratedLyrics = this.song?.meta?.lyric?.transliteration ?? ''
     this.parseLyrics()
     this.setLyricsInterval()
   }
@@ -41,10 +46,13 @@ class LyricsManager {
     this.song = undefined
     this.originalLyrics = ''
     this.translatedLyrics = ''
+    this.transliteratedLyrics = ''
     this.lyricsTimer = -1
     this.currentTimeMs = 0
     this.parsedLyrics = []
     this.currentIndex = 0
+    this.hasTranslation = false
+    this.hasTransliteration = false
   }
 
   async setLyricsInterval(){
@@ -79,26 +87,35 @@ class LyricsManager {
     if (this.originalLyrics.trim() === '') {
       this.parsedLyrics = []
       this.hasTranslation = false
+      this.hasTransliteration = false
       return
     }
 
     // 首先解析原始歌词
-    const originalLines = this.parseLyricsText(this.originalLyrics)
+    this.parsedLyrics = this.parseLyricsText(this.originalLyrics)
 
     // 检查是否有翻译歌词
+    let translationLines: LyricsLine[] = []
     if (this.translatedLyrics && this.translatedLyrics.trim() !== '') {
       this.hasTranslation = true
-      const translationLines = this.parseLyricsText(this.translatedLyrics)
-
-      // 合并原始歌词和翻译歌词
-      this.parsedLyrics = this.mergeLyrics(originalLines, translationLines)
-    } else {
-      this.hasTranslation = false
-      this.parsedLyrics = originalLines
+      translationLines = this.parseLyricsText(this.translatedLyrics)
     }
+
+    // 检查是否有音译歌词
+    let transliteratedLines: LyricsLine[] = []
+    if (this.transliteratedLyrics && this.transliteratedLyrics.trim() !== '') {
+      this.hasTransliteration = true
+      transliteratedLines = this.parseLyricsText(this.transliteratedLyrics)
+    }
+
+    // 合并原始歌词和翻译歌词/音译歌词
+    this.parsedLyrics = this.mergeLyrics(translationLines, transliteratedLines)
+
     AppStorage.setOrCreate<boolean>('current_lyrics_has_translation', this.hasTranslation)
+    AppStorage.setOrCreate<boolean>('current_lyrics_has_transliteration', this.hasTransliteration)
     AppStorage.setOrCreate<Array<LyricsLine>>('current_parsed_lyrics', this.parsedLyrics)
     console.info(`完成解析[${this.song?.name}]歌词`)
+    console.info(`歌词：${JSON.stringify(this.parsedLyrics)}`)
   }
 
   /**
@@ -133,33 +150,54 @@ class LyricsManager {
 
   /**
    * 合并原始歌词和翻译歌词，为原始歌词添加对应的翻译
-   * @param originalLyrics - 原始歌词行数组
+   * @param transliteratedLyrics - 音译歌词行数组
    * @param translationLyrics - 翻译歌词行数组
    * @returns LyricsLine[] - 合并后的歌词行数组，其中原始歌词行包含了对应的翻译文本
    */
-  private mergeLyrics(originalLyrics: LyricsLine[], translationLyrics: LyricsLine[]): LyricsLine[] {
+  private mergeLyrics(translationLyrics: LyricsLine[], transliteratedLyrics: LyricsLine[]): LyricsLine[] {
     // 创建结果数组，深拷贝原始歌词避免引用问题
-    const mergedLyrics: LyricsLine[] = JSON.parse(JSON.stringify(originalLyrics))
+    const mergedLyrics: LyricsLine[] = JSON.parse(JSON.stringify(this.parsedLyrics))
 
     // 为每一行原始歌词寻找最接近的翻译行
     mergedLyrics.forEach((line, _index) => {
       // 寻找时间最接近的翻译
       let closestTranslation: LyricsLine | null = null
+      let closestTransliteration: LyricsLine | null = null
       let minTimeDiff = Number.MAX_VALUE
 
-      translationLyrics.forEach(transLine => {
-        const timeDiff = Math.abs(transLine.time - line.time)
-        // 如果找到时间差更小的翻译行
-        if (timeDiff < minTimeDiff) {
-          minTimeDiff = timeDiff
-          closestTranslation = transLine
-        }
-      })
+      if(this.hasTranslation){
+        translationLyrics.forEach(transLine => {
+          const timeDiff = Math.abs(transLine.time - line.time)
+          // 如果找到时间差更小的翻译行
+          if (timeDiff < minTimeDiff) {
+            minTimeDiff = timeDiff
+            closestTranslation = transLine
+          }
+        })
 
-      // 如果找到匹配的翻译，且时间差在合理范围内（例如50毫秒）
-      if (closestTranslation !== null && minTimeDiff <= 50) {
-        line.translation = (closestTranslation as LyricsLine).text
+        // 如果找到匹配的翻译，且时间差在合理范围内（例如50毫秒）
+        if (closestTranslation !== null && minTimeDiff <= 50) {
+          line.translation = (closestTranslation as LyricsLine).text
+        }
       }
+
+      minTimeDiff = Number.MAX_VALUE
+      if(this.hasTransliteration){
+        transliteratedLyrics.forEach(transLine => {
+          const timeDiff = Math.abs(transLine.time - line.time)
+          // 如果找到时间差更小的翻译行
+          if (timeDiff < minTimeDiff) {
+            minTimeDiff = timeDiff
+            closestTransliteration = transLine
+          }
+        })
+
+        // 如果找到匹配的翻译，且时间差在合理范围内（例如50毫秒）
+        if (closestTransliteration !== null && minTimeDiff <= 50) {
+          line.transliteration = (closestTransliteration as LyricsLine).text
+        }
+      }
+
     })
 
     return mergedLyrics

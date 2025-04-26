@@ -3,6 +3,7 @@ import { avPlayerManager } from "../util/AVPlayerManager";
 import { PreferencesCache } from "../util/PreferenceCache";
 import { LengthMetrics } from '@kit.ArkUI'
 import { LyricsLine } from "../util/LyricsManager";
+import { VibrationControl } from "../util/DeviceController";
 
 class LyricStyle {
   fontWeight: FontWeight;
@@ -26,9 +27,11 @@ export struct LyricsView {
   @State private isAnimating: boolean = false
   @State private showTranslation: boolean = PreferencesCache.showTranslationLyric()
   @StorageProp('current_lyrics_has_translation') private hasTranslation: boolean = false // 是否有翻译歌词
+  @StorageProp('current_lyrics_has_transliteration') private hasTransliteration: boolean = false
   private scroller: Scroller = new Scroller()
   private readonly ANIMATION_DURATION: number = 300
   private readonly SCROLL_ANIMATION_DURATION: number = 400
+  private lastTriggerTime: number = 0;
 
   aboutToAppear() {
     this.scrollToLyric(this.currentLyricsIndex)
@@ -50,7 +53,7 @@ export struct LyricsView {
     }
 
     // 保持在视图中间偏上的位置，很显然这是一个经验修正
-    const targetIndex = Math.max(0,this.mode_judge? index - (5 * (this.showTranslation ? 0.6 : 1)):index-1)
+    const targetIndex = Math.max(0, this.mode_judge ? index - (5 * (this.showTranslation ? 0.2 : 0.6)) : index - (this.showTranslation ? 0 : 1))
 
     animateTo({
       duration: this.SCROLL_ANIMATION_DURATION,
@@ -80,7 +83,9 @@ export struct LyricsView {
   private toggleTranslation() {
     animateTo({ duration: 300, curve: Curve.EaseInOut }, () => {
       this.showTranslation = !this.showTranslation
+      this.scrollToLyric(this.currentLyricsIndex)
       PreferencesCache.showTranslationLyric(this.showTranslation)
+      VibrationControl.handlePresetVibration()
     })
   }
 
@@ -94,6 +99,18 @@ export struct LyricsView {
       isCurrent ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
       isCurrent ? 1 : 0.7
     )
+  }
+
+  /**
+   * 双指操作防抖
+   * @param func
+   */
+  private debounce(func: Function) {
+    const now = Date.now();
+    if (now - this.lastTriggerTime > 300) {
+      func();
+      this.lastTriggerTime = now;
+    }
   }
 
   build() {
@@ -130,9 +147,32 @@ export struct LyricsView {
                       curve: Curve.EaseInOut
                     })
 
-                  // 翻译/音译歌词 (仅当启用显示翻译且该行有翻译时显示)
+                  // 翻译歌词 (仅当启用显示翻译且该行有翻译时显示)
                   if (this.showTranslation && item.translation) {
                     Text(item.translation)
+                      .fontSize(16)
+                      .fontWeight(FontWeight.Normal)
+                      .fontColor(this.getLyricStyle(index).fontColor)
+                      .opacity(this.getLyricStyle(index).opacity * 0.9)
+                      .margin({ bottom: 4 })
+                      .padding({
+                        left: 16,
+                        right: 16,
+                        top: 4,
+                        bottom: 4
+                      })
+                      .textAlign(TextAlign.Center)
+                      .borderRadius(8)
+                      .backgroundColor('transparent')
+                      .animation({
+                        duration: this.ANIMATION_DURATION,
+                        curve: Curve.EaseInOut
+                      })
+                  }
+
+                  // 音译歌词 (仅当启用显示翻译且该行有翻译时显示)
+                  if (this.showTranslation && item.transliteration) {
+                    Text(item.transliteration)
                       .fontSize(16)
                       .fontWeight(FontWeight.Normal)
                       .fontColor(this.getLyricStyle(index).fontColor)
@@ -174,12 +214,12 @@ export struct LyricsView {
       .width(StyleConstants.FULL_WIDTH)
       .height(StyleConstants.FULL_HEIGHT)
 
-      if (this.hasTranslation&&this.mode_judge===true) {
+      if ((this.hasTranslation || this.hasTransliteration) && this.mode_judge === true) {
         Button({ type: ButtonType.Circle }) {
           Image($r('app.media.ic_translate'))
             .width(24)
             .height(24)
-            .fillColor(this.showTranslation ? Color.White : 'rgba(255, 255, 255, 0.6)')
+            .fillColor((this.hasTranslation || this.hasTransliteration) ? Color.White : 'rgba(255, 255, 255, 0.6)')
         }
         .width(48)
         .height(48)
@@ -197,5 +237,23 @@ export struct LyricsView {
     .width(StyleConstants.FULL_WIDTH)
     .height(StyleConstants.FULL_HEIGHT)
     .expandSafeArea()
+    .gesture(
+      PinchGesture()
+        .onActionUpdate((event: PinchGestureEvent) => {
+          if (event.scale > 1.1) {
+            this.debounce(() => {
+              if(!this.showTranslation && (this.hasTranslation || this.hasTransliteration)){
+                this.toggleTranslation()
+              }
+            });
+          } else if (event.scale < 0.9) {
+            this.debounce(() => {
+              if(this.showTranslation && (this.hasTranslation || this.hasTransliteration)){
+                this.toggleTranslation()
+              }
+            });
+          }
+        })
+    )
   }
 }
